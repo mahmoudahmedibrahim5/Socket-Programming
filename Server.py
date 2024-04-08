@@ -2,15 +2,16 @@ import socket
 import threading
 
 def handle_client(conn, addr):
-    print("New Connection")
     connected = True
     while connected:
-        msg_length = int(conn.recv(HEADER).decode(FORMAT))
-        msg = conn.recv(msg_length).decode(FORMAT)
-        print(f"{addr} {msg}")
-        
-        if msg == DISCONNECT_MESSAGE:
-            connected = False
+        msg_length = conn.recv(HEADER).decode(FORMAT)
+        if msg_length:
+            msg_length = int(msg_length)
+            msg = conn.recv(msg_length).decode(FORMAT)
+            print(f"{addr} {msg}")
+            
+            if msg == DISCONNECT_MESSAGE:
+                connected = False
     conn.close()
 
 def start():
@@ -21,7 +22,7 @@ def start():
         conn, addr = server.accept()
         thread = threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
-        print(f"New thread is started, now there is {threading.activeCount() - 1} active")
+        print(f"New thread has started, now there is {threading.active_count() - 1} active connections")
 
 
 
